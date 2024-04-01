@@ -77,7 +77,7 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
-                    
+                # print("In for: " + str(type(self.board)))
                 if self.board.getPlayer() == const.BLACK:
                     if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                         mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -91,8 +91,16 @@ class Game:
                                 print("In teriorul tablei x:" + str(board_x) + " y:" + str(board_y))
                         else:
                             print("In afara tablei")
-                        
             if self.board.getPlayer() == const.WHITE:
+                self.screen.fill(const.BACKGROUND_COLOR)
+
+                self.drawTurnText()
+
+                self.drawTime()
+
+                self.drawBoard()
+                                
+                
                 self.board = self.board.AIMakeMove()
                 
             # if self.board.winner() != None:
@@ -101,14 +109,12 @@ class Game:
             # # fill the screen with a color to wipe away anything from last frame
             self.screen.fill(const.BACKGROUND_COLOR)
 
-            # RENDER YOUR GAME HERE
             self.drawTurnText()
 
             self.drawTime()
 
             self.drawBoard()
 
-            # flip() the display to put your work on screen
             pygame.display.flip()
         pygame.quit()
 

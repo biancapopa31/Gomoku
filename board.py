@@ -27,6 +27,7 @@ class Board:
             self.successors = [None for _ in range(const.ROWS * const.COLS)]
         else:
             self.successors = copy.deepcopy(successors)
+            
         
     def __eq__(self, other):
         for i in range (const.ROWS):
@@ -58,9 +59,17 @@ class Board:
         return True
     
     def addMove(self, x, y): # returneaza un nou board cu mutarea adaugata
+        if self.nrFullCells == 0:
+            print("Prima mutare")
+            newBoard = Board(self.nextPlayer(), x, y, self.matrix, self, successors=[])
+            newBoard.matrix[x][y] = self.player
+            newBoard.nrFullCells = self.nrFullCells + 1
+            return newBoard
+        self.genSuccessors()
+        # print("In AddMove " + str(len([1 for i in self.successors if i is not None])))
+        return self.successors[x * const.COLS + y]
         
-        return self.genSuccessor(x, y)
-    
+            
     def hasNeighbor(self, x, y):
         for i in range(-1, 2):
             for j in range(-1, 2):
@@ -70,26 +79,6 @@ class Board:
                     if self.matrix[x + i][y + j] != None:
                         return True
         return False
-    
-    def genSuccessor(self, x, y):
-        if self.successors[x * const.COLS + y] is not None:
-            return self.successors[x * const.COLS + y]
-        
-        newBoard = Board(self.nextPlayer(), x, y, self.matrix, self, successors=[])
-        newBoard.matrix[x][y] = self.player
-        newBoard.nrFullCells = self.nrFullCells + 1
-        
-        self.successors[x* const.COLS + y] = newBoard
-        
-        return newBoard
-    
-    def pathToRoot(self):
-        if self.parinte is None:
-            return [self]
-        return self.parinte.pathToRoot() + [self]
-
-    def visited(self):
-        return len([1 for nod in self.pathToRoot() if nod == self]) > 1
     
     def genSuccessors(self):
         if len([1 for i in self.successors if i is not None]) != 0:
@@ -135,38 +124,29 @@ class Board:
                         return self.matrix[i][j]
         return None
     
-    # def scor(self): # returneaza valoarea board-ului
-    #     scor = 0
-    #     winner = self.winner()
-    #     if winner == self.player:
-    #         return 100
-    #     elif winner == self.nextPlayer():
-    #         return -100
-    #     elif winner == "remiza":
-    #         return 0
+    def score(self): # returneaza valoarea board-ului
+        scor = 0
+        winner = self.winner()
+        if winner == self.player:
+            return 100
+        elif winner == self.nextPlayer():
+            return -100
+        elif winner == "remiza":
+            return 0
         
-    #     for i in range(const.ROWS):
-    #         for dir in range(4):
-    #             x, y = directions[dir]
-    #             v = self.getVector(i, 0, x, y)
-    #             self.evalVector(v)
+        return scor
+        
+        # for i in range(const.ROWS):
+        #     for dir in range(4):
+        #         x, y = directions[dir]
+        #         v = self.getVector(i, 0, x, y)
+        #         self.evalVector(v)
                 
-    #         self.evalVector(i, 0, 0, 1)
+        #     self.evalVector(i, 0, 0, 1)
             
             
             
-    def score(self):
-        """
-        This function scores the current state of the Go-mocku game based on winning chances for the player (self).
-
-        Utilizes attributes from the class instance (self) and game constants for clarity.
-
-        Args:
-            self: Reference to the game object instance.
-
-        Returns:
-            A score (integer) reflecting the player's advantage. Higher score indicates better chances.
-        """
+    def score_lung(self):
         
         winner = self.winner()
         if winner == self.player:
@@ -231,8 +211,6 @@ class Board:
                         if double_fork_count >= 2:
                             score += 5  # Higher bonus for potential double fork
 
-        # Additional considerations (optional):
-        # - Analyze opponent's potential forks and double forks to further refine
 
         return score
 

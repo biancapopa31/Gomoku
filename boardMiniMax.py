@@ -6,30 +6,21 @@ class BoardMiniMax (board.Board):
     def __init__(self, player, x = 0, y = 0, matrix = [], parent=None, successors = []):
         super().__init__(player, x, y, matrix, parent, successors)
         
-    def genSuccessor(self, x, y):
-        if self.successors[x * const.COLS + y] is not None:
-            return self.successors[x * const.COLS + y]
         
-        newBoard = BoardMiniMax(self.nextPlayer(), x, y, self.matrix, self, successors=[])
-        newBoard.matrix[x][y] = self.player
-        newBoard.nrFullCells = self.nrFullCells + 1
-        
-        self.successors[x* const.COLS + y] = newBoard
-        
-        return newBoard
-    
-    # def genNextSuccessor(self, x = 0, y = 0):
-    #     for i in range(x, const.ROWS):
-    #         for j in range(const.COLS):
-    #             if i == x and j == y:
-    #                 continue
-    #             elif self.canAddMove(i, j) and self.hasNeighbor(i, j):
-    #                 return self.genSuccessor(i, j)
-    #     return None
-        
+    def addMove(self, x, y): # returneaza un nou board cu mutarea adaugata
+        if self.nrFullCells == 0:
+            print("Prima mutare")
+            newBoard = BoardMiniMax(self.nextPlayer(), x, y, self.matrix, self, successors=[])
+            newBoard.matrix[x][y] = self.player
+            newBoard.nrFullCells = self.nrFullCells + 1
+            return newBoard
+        self.genSuccessors()
+        # print("In AddMove " + str(len([1 for i in self.successors if i is not None])))
+        return self.successors[x * const.COLS + y]
     
     def genSuccessors(self):        
         if len([1 for i in self.successors if i is not None]) != 0:
+            # print(self.x, self.y, len([1 for i in self.successors if i is not None]))
             return self.successors
         
         
@@ -42,6 +33,7 @@ class BoardMiniMax (board.Board):
         for i in range(const.ROWS):
             for j in range(const.COLS):
                 if self.canAddMove(i, j) and self.hasNeighbor(i, j):
+                    # print("In GenSuccessors: " + str(i) + " " + str(j))
                     
                     newBoard = BoardMiniMax(self.nextPlayer(), i, j, self.matrix, self, successors=[])
                     newBoard.matrix[i][j] = self.player

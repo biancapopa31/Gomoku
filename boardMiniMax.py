@@ -8,15 +8,20 @@ class BoardMiniMax (board.Board):
         
         
     def addMove(self, x, y): # returneaza un nou board cu mutarea adaugata
-        if self.nrFullCells == 0:
-            print("Prima mutare")
-            newBoard = BoardMiniMax(self.nextPlayer(), x, y, self.matrix, self, successors=[])
-            newBoard.matrix[x][y] = self.player
-            newBoard.nrFullCells = self.nrFullCells + 1
-            return newBoard
-        self.genSuccessors()
-        # print("In AddMove " + str(len([1 for i in self.successors if i is not None])))
-        return self.successors[x * const.COLS + y]
+        return self.genSuccessor(x, y)
+    
+    def genSuccessor(self, x, y):
+        if self.successors[x * const.COLS + y] is not None:
+            return self.successors[x * const.COLS + y]
+
+        newBoard = BoardMiniMax(self.nextPlayer(), x, y, self.matrix, self, successors=[])
+        newBoard.matrix[x][y] = self.player
+        newBoard.nrFullCells = self.nrFullCells + 1
+
+        self.successors[x* const.COLS + y] = newBoard
+
+        return newBoard 
+    
     
     def genSuccessors(self):        
         if len([1 for i in self.successors if i is not None]) != 0:
@@ -55,11 +60,7 @@ class BoardMiniMax (board.Board):
             if score is None:
                 score = self.score()
                 game.Game.transTable.set(hash(self), score)
-            if maximizingPlayer:
-                
-                return score, None
-            else:
-                return -score, None
+            return score, None
         
         if maximizingPlayer:
             value = float('-inf')
@@ -80,7 +81,6 @@ class BoardMiniMax (board.Board):
                 
         else:
             value = float('inf')
-            # child = self.genNextSuccessor()
             for child in successors:
                 if child is None:
                     continue

@@ -90,25 +90,25 @@ class Game:
                             if self.board.canAddMove(board_x, board_y):
                                 self.board = self.board.addMove(board_x, board_y)
                                 
+                                self.screen.fill(const.BACKGROUND_COLOR)
+                                self.drawTurnText()
+                                self.drawTime()
+                                self.drawBoard()
+                                pygame.display.flip()
+                                
+                                if self.board.winner() != None:
+                                    self.running = False
+                                    print("Winner is: " + str(self.board.winner())) 
                                 
                                 print("In teriorul tablei x:" + str(board_x) + " y:" + str(board_y))
                         else:
                             print("In afara tablei")
-            if self.board.getPlayer() == const.WHITE:
-                self.screen.fill(const.BACKGROUND_COLOR)
-
-                self.drawTurnText()
-
-                self.drawTime()
-
-                self.drawBoard()
-                                
-                
+            if self.board.getPlayer() == const.WHITE and self.running == True:          
                 self.board = self.board.AIMakeMove()
-                
-            # if self.board.winner() != None:
-            #     self.running = False
-            #     print("Winner is: " + str(self.board.winner()))
+                if self.board.winner() != None:
+                    self.running = False
+                    print("Winner is: " + str(self.board.winner())) 
+
             # # fill the screen with a color to wipe away anything from last frame
             self.screen.fill(const.BACKGROUND_COLOR)
 

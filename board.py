@@ -28,7 +28,6 @@ class Board:
         else:
             self.successors = copy.deepcopy(successors)
             
-        
     def __eq__(self, other):
         for i in range (const.ROWS):
             for j in range (const.COLS):
@@ -134,94 +133,21 @@ class Board:
     def score(self): # returneaza valoarea board-ului
         scor = 0
         winner = self.winner()
-        if winner == self.player:
-            return 100
-        elif winner == self.nextPlayer():
-            return -100
+        if winner == const.BLACK:
+            return -10000
+        elif winner == const.WHITE:
+            return +10000
         elif winner == "remiza":
             return 0
-        
-        return scor
-        
-        # for i in range(const.ROWS):
-        #     for dir in range(4):
-        #         x, y = directions[dir]
-        #         v = self.getVector(i, 0, x, y)
-        #         self.evalVector(v)
                 
-        #     self.evalVector(i, 0, 0, 1)
-            
-            
-            
-    def score_lung(self):
-        
-        winner = self.winner()
-        if winner == self.player:
-            return 100
-        elif winner == self.nextPlayer():
-            return -100
-        elif winner == "remiza":
-            return 0
-
-        score = 0
-        opponent = self.nextPlayer()  # Identify opponent
-
-        directions = [(1, 0), (0, 1), (1, 1), (1, -1)]
-        for row in range(const.ROWS):
-            for col in range(const.COLS):
-                empty_cell = self.matrix[row][col] is None
-
-                # Score for player's potential lines, considering blocking opportunities
-                if empty_cell or self.matrix[row][col] == self.player:
-                    consecutive_count = 1
-                    potential_block = False  # Flag to identify potential blocking opportunity
-                    for direction in directions:
-                        r, c = row, col
-                        while 0 <= r + direction[0] < const.ROWS and 0 <= c + direction[1] < const.COLS and (self.matrix[r + direction[0]][c + direction[1]] == self.player or empty_cell):
-                            consecutive_count += 1
-                            if self.matrix[r + direction[0]][c + direction[1]] == empty_cell and (0 in (r + direction[0], c + direction[1]) or const.ROWS - 1 in (r + direction[0], c + direction[1])):
-                                potential_block = True  # Potential to block opponent's line
-                            r += direction[0]
-                            c += direction[1]
-
-                        # Score with bonus for blocking opportunities near the edge
-                        if consecutive_count >= 4 and (0 in (row, col, r, c) or const.ROWS - 1 in (row, col, r, c)):
-                            score += consecutive_count ** (2 if potential_block else 1.5)
-
-                # Penalty for opponent's potential lines (but not immediate threats)
-                if empty_cell or self.matrix[row][col] == opponent:
-                    consecutive_count = 1
-                    for direction in directions:
-                        r, c = row, col
-                        while 0 <= r + direction[0] < const.ROWS and 0 <= c + direction[1] < const.COLS and (self.matrix[r + direction[0]][c + direction[1]] == opponent or empty_cell):
-                            consecutive_count += 1
-                            r += direction[0]
-                            c += direction[1]
-
-                        if consecutive_count >= 4:  # Penalize potential opponent lines (not immediate threats)
-                            score -= consecutive_count ** 1.2
-
-        # Bonus for forks (threatening two lines) and potential double forks
-        for row in range(const.ROWS):
-            for col in range(const.COLS):
-                if self.matrix[row][col] == self.player:
-                    fork_count = 0
-                    double_fork_count = 0  # Track potential for double forks
-                    for direction in directions:
-                        if 0 <= row + direction[0] < const.ROWS and 0 <= col + direction[1] < const.COLS and self.matrix[row + direction[0]][col + direction[1]] == '.':
-                            fork_count += 1
-                            # Check for empty cell in opposite direction for potential double fork
-                            if 0 <= row - direction[0] < const.ROWS and 0 <= col - direction[1] < const.COLS and self.matrix[row - direction[0]][col - direction[1]] == '.':
-                                double_fork_count += 1
-                        if fork_count >= 2:
-                            score += 3  # Bonus for each fork
-                        if double_fork_count >= 2:
-                            score += 5  # Higher bonus for potential double fork
-
-
-        return score
-
-
+        for i in range(const.ROWS):
+            for dir in range(1,4):
+                x, y = directions[dir]
+                v = self.getVector(i, 0, x, y)
+                scor -= self.evalVector(v, const.BLACK)
+                scor += self.evalVector(v, const.WHITE)
+                
+        return scor
             
     def getVector(self, x, y, dirX, dirY):
         v = []
@@ -230,3 +156,23 @@ class Board:
             x = x + dirX
             y = y + dirY
         return v
+    
+    def evalVector(self, v, player):
+        if len(v) < 5:
+            return 0
+        eval = 0
+        for i in range(len(v) - 4):
+            eval += self.evalSeq(v[i:i+5], player)
+                    
+        return eval
+    def evalSeq(self, seq, player):
+        if seq.count(player) == 4 and seq.count(None) == 1:
+            return 1000
+        if seq.count(player) == 3 and seq.count(None) == 2:
+            return 100
+        if seq.count(player) == 2 and seq.count(None) == 3:
+            return 10
+        if seq.count(player) == 1 and seq.count(None) == 4:
+            return 1
+        return 0
+    

@@ -1,5 +1,5 @@
 import board
-import copy
+import game
 import constants as const
 
 class BoardMiniMax (board.Board):
@@ -51,10 +51,15 @@ class BoardMiniMax (board.Board):
         successors = self.genSuccessors()
         # child = self.genNextSuccessor()
         if depth == 0 or len([1 for i in successors if i is not None]) == 0:
+            score = game.Game.transTable.lookup(hash(self))
+            if score is None:
+                score = self.score()
+                game.Game.transTable.set(hash(self), score)
             if maximizingPlayer:
-                return self.score(), None
+                
+                return score, None
             else:
-                return -self.score(), None
+                return -score, None
         
         if maximizingPlayer:
             value = float('-inf')

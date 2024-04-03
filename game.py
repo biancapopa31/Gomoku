@@ -3,11 +3,13 @@ import time
 import board
 import boardMiniMax
 import utils
+import transpositionTable as table
 import constants as const
 
 # pygame setup
 
 class Game:
+    transTable = table.transTable()
     def __init__(self, alg, dif):
         self.screenSetup()
         
@@ -18,6 +20,7 @@ class Game:
 
         self.running = True
         self.startTime = time.time()
+        
 
         self.run()
 

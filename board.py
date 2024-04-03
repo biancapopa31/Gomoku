@@ -35,6 +35,13 @@ class Board:
                 if self.matrix[i][j] != other.matrix[i][j]:
                     return False
         return True
+    
+    def __hash__(self):
+        matrix_str = str(self.matrix)
+
+        matrix_hash = hash(matrix_str)
+
+        return matrix_hash
 
 
     def getVal(self, x, y):

@@ -1,9 +1,9 @@
 import board
-import game
+import utils
 import constants as const
 
 class BoardMiniMax (board.Board):
-    def __init__(self, player, x = 0, y = 0, matrix = [], parent=None, successors = []):
+    def __init__(self, player ,x = 0, y = 0, matrix = [], parent=None, successors = []):
         super().__init__(player, x, y, matrix, parent, successors)
         
         
@@ -48,7 +48,7 @@ class BoardMiniMax (board.Board):
         return self.successors
     
     def AIMakeMove(self):
-        _, bestMove = self.minimax(4, True)
+        _, bestMove = self.minimax(const.DEPTH, True)
         newBoard = self.successors[bestMove[0] * const.COLS + bestMove[1]]
         return newBoard
 
@@ -56,10 +56,10 @@ class BoardMiniMax (board.Board):
         successors = self.genSuccessors()
         # child = self.genNextSuccessor()
         if depth == 0 or len([1 for i in successors if i is not None]) == 0:
-            score = game.Game.transTable.lookup(hash(self))
+            score = utils.transTable.lookup(hash(self))
             if score is None:
                 score = self.score()
-                game.Game.transTable.set(hash(self), score)
+                utils.transTable.set(hash(self), score)
             return score, None
         
         if maximizingPlayer:
@@ -96,3 +96,9 @@ class BoardMiniMax (board.Board):
                 
         return value, bestMove
 
+
+
+
+b = BoardMiniMax(const.BLACK, 4, 4, [[j*const.ROWS + i for i in range(const.COLS)] for j in range(const.ROWS)])
+print(b)
+b.score()

@@ -1,4 +1,8 @@
 import constants as const
+import transpositionTable as table
+
+transTable = table.transTable()
+
 
 # functions for coords
 
@@ -33,3 +37,4 @@ def coordsToIndex(mouse_x, mouse_y):
             return round((mouse_x + const.CELL_SIZE)/const.CELL_SIZE)-1, round((mouse_y + const.CELL_SIZE)/const.CELL_SIZE)-1
         else:
             return None, None
+        

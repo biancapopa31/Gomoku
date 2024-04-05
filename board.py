@@ -27,7 +27,23 @@ class Board:
             self.successors = [None for _ in range(const.ROWS * const.COLS)]
         else:
             self.successors = copy.deepcopy(successors)
-            
+         
+    
+    def __str__(self):
+
+        matrix_to_stringify = copy.copy(self.matrix)
+
+        for row in range(const.ROWS):
+            for col in range(const.COLS):
+                if matrix_to_stringify[row][col] is None:
+                    matrix_to_stringify[row][col] = '-'  
+
+        string_representation = f"Player: {self.player}\n"
+        for row in matrix_to_stringify:
+            string_representation += '|' + '|'.join(str(cell) for cell in row) + '|\n'
+
+        return string_representation     
+       
     def __eq__(self, other):
         for i in range (const.ROWS):
             for j in range (const.COLS):
@@ -110,7 +126,7 @@ class Board:
     
     def winner(self): # returneaza jucatorul castigator sau None daca nu exista castigator
         if self.isFull():
-            return "remiza"
+            return const.DRAW
         
         for i in range (const.ROWS):
             for j in range(const.COLS):
@@ -134,18 +150,47 @@ class Board:
         scor = 0
         winner = self.winner()
         if winner == const.BLACK:
-            return -10000
+            return -100000
         elif winner == const.WHITE:
-            return +10000
-        elif winner == "remiza":
+            return +100000
+        elif winner == const.DRAW:
             return 0
                 
         for i in range(const.ROWS):
-            for dir in range(1,4):
-                x, y = directions[dir]
-                v = self.getVector(i, 0, x, y)
+            x, y = directions[0] # directia verticala (1, 0)
+            v = self.getVector(0, i, x, y)
+            scor -= self.evalVector(v, const.BLACK)
+            scor += self.evalVector(v, const.WHITE)
+            # print(v)
+            
+            x,y = directions[1] # directia orizontala (0, 1)
+            v = self.getVector(i, 0, x, y)
+            scor -= self.evalVector(v, const.BLACK)
+            scor += self.evalVector(v, const.WHITE)
+            # print(v)
+            
+            x,y = directions[2] # directia diagonala principala (1, 1)
+            v = self.getVector(i, 0, x, y)
+            scor -= self.evalVector(v, const.BLACK)
+            scor += self.evalVector(v, const.WHITE)
+            # print(v)
+            if(i != 0):
+                v = self.getVector(0, i, x, y)
                 scor -= self.evalVector(v, const.BLACK)
                 scor += self.evalVector(v, const.WHITE)
+                # print(v)
+            
+            x,y = directions[3] # directia diagonala secundara (1, -1)
+            v = self.getVector(0, i, x, y)
+            scor -= self.evalVector(v, const.BLACK)
+            scor += self.evalVector(v, const.WHITE)
+            # print(v)
+            if(i != 0):
+                v = self.getVector(i, const.ROWS-1, x, y)
+                scor -= self.evalVector(v, const.BLACK)
+                scor += self.evalVector(v, const.WHITE)
+                # print(v)
+                
                 
         return scor
             
@@ -176,3 +221,5 @@ class Board:
             return 1
         return 0
     
+
+

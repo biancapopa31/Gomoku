@@ -3,25 +3,22 @@ import time
 import board
 import boardMiniMax
 import utils
-import transpositionTable as table
 import constants as const
 
 # pygame setup
 
 class Game:
-    transTable = table.transTable()
     def __init__(self, alg, dif):
         self.screenSetup()
         
-        # if(alg == const.MINIMAX):
-        self.board = boardMiniMax.BoardMiniMax(const.BLACK)
+        if(alg == const.MINIMAX):
+            self.board = boardMiniMax.BoardMiniMax(const.BLACK)
         # else:
             # self.board = board.Board(const.BLACK)
 
         self.running = True
         self.startTime = time.time()
-        
-
+        const.DEPTH = dif        
         self.run()
 
     # Setting up the screen's size, color, and top text.

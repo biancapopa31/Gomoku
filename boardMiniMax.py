@@ -96,9 +96,3 @@ class BoardMiniMax (board.Board):
                 
         return value, bestMove
 
-
-
-
-b = BoardMiniMax(const.BLACK, 4, 4, [[j*const.ROWS + i for i in range(const.COLS)] for j in range(const.ROWS)])
-print(b)
-b.score()

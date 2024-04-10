@@ -71,13 +71,24 @@ class Game:
             for j in range(const.ROWS):
                 if self.board.getVal(i,j) != None:
                     self.drawCircle(utils.indexToCoords(i, j), self.board.getVal(i,j))
+                    
+    def drawWinner(self):
+        overlay_surface = pygame.Surface((const.SCREEN_WIDTH, const.SCREEN_HEIGHT), pygame.SRCALPHA)
+        overlay_surface.fill(const.OVERLAY_COLOR)
+        
+        winnerTextSurface = self.font.render(("Black" if self.board.winner() == const.BLACK else "White") +" won", True, (255, 255, 255))
+
+        winnerTextRect = winnerTextSurface.get_rect()
+
+        self.screen.blit(overlay_surface, (0, 0))
+        self.screen.blit(winnerTextSurface, ((const.SCREEN_WIDTH - winnerTextRect.width) //2, (const.SCREEN_HEIGHT - winnerTextRect.height) //2))
+        
         
     def run(self):
         while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
-                # print("In for: " + str(type(self.board)))
                 if self.board.getPlayer() == const.BLACK:
                     if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                         mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -106,7 +117,7 @@ class Game:
                     self.running = False
                     print("Winner is: " + str(self.board.winner())) 
 
-            # # fill the screen with a color to wipe away anything from last frame
+            # fill the screen with a color to wipe away anything from last frame
             self.screen.fill(const.BACKGROUND_COLOR)
 
             self.drawTurnText()
@@ -114,6 +125,13 @@ class Game:
             self.drawTime()
 
             self.drawBoard()
+            
+            if self.board.winner() != None:
+                self.drawWinner()
+                
+                pygame.display.flip()
+                
+                time.sleep(2)
 
             pygame.display.flip()
         pygame.quit()
